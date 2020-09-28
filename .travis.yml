@@ -1,72 +1,35 @@
 language: python
-sudo: false
+cache: pip
 
 matrix:
   include:
-    - python: 3.4
-      env: DJANGO="==1.8.*"
-    - python: 3.4
-      env: DJANGO="==1.9.*"
-    - python: 3.4
-      env: DJANGO="==1.10.*"
-    - python: 3.4
-      env: DJANGO="==1.11.*"
+    - python: '2.7'
+    - python: '3.5'
+    - python: '3.6'
+    # Docker dev image
+    - sudo: required
+      services:
+        - docker
+      env:
+        - IMAGE_NAME=asia.gcr.io/gcp-akash-287109/django-test
+      before_install:
+        - openssl aes-256-cbc -K $encrypted_0a08b4698b52_key -iv $encrypted_0a08b4698b52_iv -in gcp-akash-287109-41bac7d58115.json.enc -out ~\/gcp-akash-287109-41bac7d58115.json -d
+        - sudo apt-get update
+        - sudo apt-get install -y -o Dpkg::Options::="--force-confold" docker-engine
+      install: []
 
-    - python: 3.5
-      env: DJANGO="==1.8.*"
-    - python: 3.5
-      env: DJANGO="==1.9.*"
-    - python: 3.5
-      env: DJANGO="==1.10.*"
-    - python: 3.5
-      env: DJANGO="==1.11.*"
-    - python: 3.5
-      env: DJANGO="==2.0.*"
-    - python: 3.5
-      env: DJANGO="==2.1.*"
-    - python: 3.5
-      env: DJANGO="==2.2.*"
+      before_script:
+        - docker pull "${IMAGE_NAME}:develop" || true
+      script:
+        - docker build --pull --cache-from "${IMAGE_NAME}:develop" --tag "$IMAGE_NAME" .
 
-    - python: 3.6
-      env: DJANGO="==1.8.*"
-    - python: 3.6
-      env: DJANGO="==1.9.*"
-    - python: 3.6
-      env: DJANGO="==1.10.*"
-    - python: 3.6
-      env: DJANGO="==1.11.*"
-    - python: 3.6
-      env: DJANGO="==2.0.*"
-    - python: 3.6
-      env: DJANGO="==2.1.*"
-    - python: 3.6
-      env: DJANGO="==2.2.*"
-    - python: 3.6
-      env: DJANGO=">=3.0a1,<3.1"
-
-    - python: 3.7
-      env: DJANGO="==2.0.*"
-    - python: 3.7
-      env: DJANGO="==2.1.*"
-    - python: 3.7
-      env: DJANGO="==2.2.*"
-    - python: 3.7
-      env: DJANGO=">=3.0a1,<3.1"
-
-    - os: osx
-      language: generic
-      env: DJANGO="==1.10.*"
-
-# Perform the manual steps on OSX to install Python3 and activate venv:
-# Since Python versions have been tested on Linux and it is only a matter of
-# system architecture, OSX tests will only run on one Python 3 + latest stable
-# release for Django.
-before_install:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then python3 -m venv env        ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then source env/bin/activate    ; fi
-
-install:
-  - pip install -q django$DJANGO
-  - python setup.py install
-
-script: python runtests.py
+      before_deploy:
+        - docker login -u "$REGISTRY_USER" -p "$REGISTRY_PASS"
+        - git_sha="$(git rev-parse --short HEAD)"
+        - docker tag "$IMAGE_NAME" "${IMAGE_NAME}:develop"
+        - docker tag "$IMAGE_NAME" "${IMAGE_NAME}:${git_sha}-develop"
+      deploy:
+        provider: script
+        script: docker push "${IMAGE_NAME}:develop" && docker push "${IMAGE_NAME}:${git_sha}-develop"
+        on:
+          branch: develop
