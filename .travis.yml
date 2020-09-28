@@ -13,6 +13,8 @@ matrix:
       env:
         - IMAGE_NAME=asia.gcr.io/gcp-akash-287109/django-test
       before_install:
+        - pwd
+        - ls
         - openssl aes-256-cbc -K $encrypted_0a08b4698b52_key -iv $encrypted_0a08b4698b52_iv -in gcp-akash-287109-41bac7d58115.json.enc -out ~\/gcp-akash-287109-41bac7d58115.json -d
         - sudo apt-get update
         - sudo apt-get install -y -o Dpkg::Options::="--force-confold" docker-engine
