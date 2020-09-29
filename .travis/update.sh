@@ -1,6 +1,6 @@
 #!/bin/sh
 clone_git(){
-  git clone https://github.com/akash1808/django-deployment
+  git clone https://${GH_TOKEN}@github.com/akash1808/django-deployment
 }
 setup_git() {
   cd django-deployment
