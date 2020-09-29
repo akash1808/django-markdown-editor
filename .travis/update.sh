@@ -2,7 +2,7 @@
 clone_git(){
   git config --global filter.lfs.smudge "git-lfs smudge --skip"
   timeout 60  git clone --progress --verbose https://${GH_TOKEN}@github.com/akash1808/django-deployment.git
-  cd django-deploymen
+  cd django-deployment
   git fetch
   git checkout master
 }
