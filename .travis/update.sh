@@ -1,7 +1,6 @@
 #!/bin/sh
 clone_git(){
   git config --global filter.lfs.smudge "git-lfs smudge --skip"
-  git clone https://${GH_TOKEN}@github.com/akash1808/django-deployment
 }
 setup_git() {
   cd django-deployment
