@@ -5,8 +5,8 @@ cd django-deployment
 timeout 10 git fetch
 timeout 10 git checkout master
 echo "complete"
-timeout 10 git config --global user.email "travis@travis-ci.org"
-timeout 10 git config --global user.name "Travis CI"
+#timeout 10 git config --global user.email "travis@travis-ci.org"
+#timeout 10 git config --global user.name "Travis CI"
 
 cat $1 > check.txt
 timeout 10 git add check.txt
