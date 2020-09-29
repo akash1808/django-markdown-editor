@@ -1,39 +1,47 @@
 language: python
 cache: pip
-
 matrix:
   include:
-    - python: '2.7'
-    - python: '3.5'
-    - python: '3.6'
-    # Docker dev image
-    - sudo: required
-      services:
-        - docker
-      env:
-        - IMAGE_NAME=asia.gcr.io/gcp-akash-287109/django-test
-      before_install:
-        - pwd
-        - ls
-        - openssl aes-256-cbc -K $encrypted_0a08b4698b52_key -iv $encrypted_0a08b4698b52_iv -in gcp-akash-287109-41bac7d58115.json.enc -out ~/gcp-akash-287109-41bac7d58115.json -d
-        - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-        - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-        - sudo apt-get update
-        - sudo apt-get -y install docker-ce
-      install: []
+  - python: '2.7'
+  - python: '3.5'
+  - python: '3.6'
+  - sudo: required
+    services:
+    - docker
+    env:
+    - IMAGE_NAME=asia.gcr.io/gcp-akash-287109/django-test
+    before_install:
+    - pwd
+    - ls
+    - openssl aes-256-cbc -K $encrypted_0a08b4698b52_key -iv $encrypted_0a08b4698b52_iv
+      -in gcp-akash-287109-41bac7d58115.json.enc -out ~/gcp-akash-287109-41bac7d58115.json
+      -d
+    - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+    - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu
+      $(lsb_release -cs) stable"
+    - sudo apt-get update
+    - sudo apt-get -y install docker-ce 
+    install: []
+    before_script:
+    - docker pull "${IMAGE_NAME}:develop" || true
+    script:
+    - docker build --pull --cache-from "${IMAGE_NAME}:develop" --tag "$IMAGE_NAME"
+      .
+    before_deploy:
+    - cat ~/gcp-akash-287109-41bac7d58115.json | docker login -u _json_key --password-stdin
+      https://asia.gcr.io
+    - git_sha="$(git rev-parse --short HEAD)"
+    - docker tag "$IMAGE_NAME" "${IMAGE_NAME}:develop"
+    - docker tag "$IMAGE_NAME" "${IMAGE_NAME}:${git_sha}-develop"
+    deploy:
+      provider: script
+      script: docker push "${IMAGE_NAME}:develop" && docker push "${IMAGE_NAME}:${git_sha}-develop"
+      on:
+        branch: develop
 
-      before_script:
-        - docker pull "${IMAGE_NAME}:develop" || true
-      script:
-        - docker build --pull --cache-from "${IMAGE_NAME}:develop" --tag "$IMAGE_NAME" .
+after_success:
+  - .travis/update.sh ${git_sha}
 
-      before_deploy:
-        - cat ~/gcp-akash-287109-41bac7d58115.json | docker login -u _json_key --password-stdin https://asia.gcr.io
-        - git_sha="$(git rev-parse --short HEAD)"
-        - docker tag "$IMAGE_NAME" "${IMAGE_NAME}:develop"
-        - docker tag "$IMAGE_NAME" "${IMAGE_NAME}:${git_sha}-develop"
-      deploy:
-        provider: script
-        script: docker push "${IMAGE_NAME}:develop" && docker push "${IMAGE_NAME}:${git_sha}-develop"
-        on:
-          branch: develop
+env:
+  global:
+    secure: VmQ/dlaY7MoZhJC2yaiZn5011umkaY70Rg0GK40DbNEDZuPC5HnmfRTQwWBt5TuPByNB+E/XXbZtl6gHCOgMDwg2G3h/po3UrAl1QTD6ICQ25xpfh1jniGS809hbrIUL8idwgW8/60x+F0cxIIyjXkqyi/kX9zqMjDwQNTaSziie7MOHP4m0tDY4Vzg2ut1TofhnIejnclnSUM6mfONSUD0O1S68dIM8su086mTkFuXgG8DE44hKZ3Z9UJP1bi/npaWcbv0o2zbXQIfSiPK5RGQNKMPxH84PkkSOqDWM+drW7VioV3Qhj7n1oJBfZzEnKKbuv4cZIlL69RceB09wClwcf7YMRlxY0j8kkleCrx8A1p89oLEeWdikgR/+zsq+6U3ZbVbezA4VKM7EY+3WaIwGqL9P+guOmipW7Yy/yDNDuP/4e5x/3pvG53kXXPTIYyHiiDWS+95nxZrbFYm4bdaRM0oEFGnoqS466kgBa/OnAaev8nd0MeacMBwKETB/Zq3QERZFm+3ursAriXGUH+CFjg1erybmycG45x8LPMNrMiuotb2lKjiPznUxeew5xo0oojk9JA2rv5FGLcDjz5ZPodbizvzLK4UnlMgFJqLCbL/ESeIpv9ZV34cnhiaCVO+a7SB7cyE7+h0Dz2LdwxHaPgK2ZYCu8H4KsznKjS8=

@@ -1,0 +1,24 @@
+#!/bin/sh
+clone_git(){
+  git clone https://github.com/akash1808/django-deployment.git
+}
+setup_git() {
+  cd django-deployment
+  git config --global user.email "travis@travis-ci.org"
+  git config --global user.name "Travis CI"
+}
+
+commit_files() {
+  cat $1 > check.txt
+  git add check.txt
+  git commit --message "Travis build: $TRAVIS_BUILD_NUMBER"
+}
+
+upload_files() {
+  git push --quiet --set-upstream origin master 
+}
+
+clone_git
+setup_git
+commit_files
+upload_files
