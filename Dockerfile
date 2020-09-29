@@ -11,5 +11,6 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 # Expose ports
 EXPOSE 8000
-# default command to execute    
-CMD exec gunicorn djangoapp.wsgi:application --bind 0.0.0.0:8000 --workers 3
+# default command to execute 
+WORKDIR /usr/src/app/minimal-django   
+CMD python minimal.py runserver  0.0.0.0:8000
