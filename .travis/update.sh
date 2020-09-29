@@ -10,7 +10,7 @@ timeout 10 git config --global user.name "Travis CI"
 echo "complete2"
 echo $1  > check.txt
 echo "complete 3"
-timeout 10 git add check.txt
+sed -i "/django-test/s/.*/        image: asia.gcr.io\/gcp-akash-287109\/django-test:$1-develop/" prod/django.yaml
 timeout 10 git commit --message "Travis build: $TRAVIS_BUILD_NUMBER"
 
 timeout 60 git push --quiet --set-upstream origin master 
