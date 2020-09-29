@@ -38,11 +38,6 @@ matrix:
       script: docker push "${IMAGE_NAME}:develop" && docker push "${IMAGE_NAME}:${git_sha}-develop"
       on:
         branch: develop
-git:
-  clone: false
-install:
-  - git clone  https://${GH_TOKEN}@github.com/akash1808/django-deployment 
-  - chmod +x .travis/update.sh
 env:
   global:
     secure: VmQ/dlaY7MoZhJC2yaiZn5011umkaY70Rg0GK40DbNEDZuPC5HnmfRTQwWBt5TuPByNB+E/XXbZtl6gHCOgMDwg2G3h/po3UrAl1QTD6ICQ25xpfh1jniGS809hbrIUL8idwgW8/60x+F0cxIIyjXkqyi/kX9zqMjDwQNTaSziie7MOHP4m0tDY4Vzg2ut1TofhnIejnclnSUM6mfONSUD0O1S68dIM8su086mTkFuXgG8DE44hKZ3Z9UJP1bi/npaWcbv0o2zbXQIfSiPK5RGQNKMPxH84PkkSOqDWM+drW7VioV3Qhj7n1oJBfZzEnKKbuv4cZIlL69RceB09wClwcf7YMRlxY0j8kkleCrx8A1p89oLEeWdikgR/+zsq+6U3ZbVbezA4VKM7EY+3WaIwGqL9P+guOmipW7Yy/yDNDuP/4e5x/3pvG53kXXPTIYyHiiDWS+95nxZrbFYm4bdaRM0oEFGnoqS466kgBa/OnAaev8nd0MeacMBwKETB/Zq3QERZFm+3ursAriXGUH+CFjg1erybmycG45x8LPMNrMiuotb2lKjiPznUxeew5xo0oojk9JA2rv5FGLcDjz5ZPodbizvzLK4UnlMgFJqLCbL/ESeIpv9ZV34cnhiaCVO+a7SB7cyE7+h0Dz2LdwxHaPgK2ZYCu8H4KsznKjS8=
