@@ -39,8 +39,9 @@ matrix:
       on:
         branch: develop
 after_success:
+  - git_sha="$(git rev-parse --short HEAD)"
   - chmod +x .travis/update.sh
-  - .travis/update.sh
+  - .travis/update.sh "${git_sha}"
 
 env:
   global:
