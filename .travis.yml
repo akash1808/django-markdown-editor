@@ -42,8 +42,6 @@ matrix:
 after_success:
   - chmod +x .travis/update.sh
   - .travis/update.sh ${git_sha}
-git:
-  lfs_skip_smudge: true
 
 env:
   global:
