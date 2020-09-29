@@ -1,27 +1,15 @@
 #!/bin/sh
-clone_git(){
-  git config --global filter.lfs.smudge "git-lfs smudge --skip"
-  timeout 60  git clone --progress --verbose https://${GH_TOKEN}@github.com/akash1808/django-deployment.git
-  cd django-deployment
-  timeout 10 git fetch
-  timeout 10 git checkout master
-}
-setup_git() {
-  timeout 10 git config --global user.email "travis@travis-ci.org"
-  timeout 10 git config --global user.name "Travis CI"
-}
+git config --global filter.lfs.smudge "git-lfs smudge --skip"
+timeout 60  git clone --progress --verbose https://${GH_TOKEN}@github.com/akash1808/django-deployment.git
+cd django-deployment
+timeout 10 git fetch
+timeout 10 git checkout master
+timeout 10 git config --global user.email "travis@travis-ci.org"
+timeout 10 git config --global user.name "Travis CI"
 
-commit_files() {
-  cat $1 > check.txt
-  timeout 10 git add check.txt
-  timeout 10 git commit --message "Travis build: $TRAVIS_BUILD_NUMBER"
-}
+cat $1 > check.txt
+timeout 10 git add check.txt
+timeout 10 git commit --message "Travis build: $TRAVIS_BUILD_NUMBER"
 
-upload_files() {
-  timeout 60 git push --quiet --set-upstream origin master 
-}
+timeout 60 git push --quiet --set-upstream origin master 
 
-timeout 85 clone_git
-timeout 25 setup_git
-timeout 25 commit_files
-timeout 65 upload_files
